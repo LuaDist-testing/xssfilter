@@ -1,0 +1,14 @@
+<rss version="2.0">
+ <channel>
+  <title>XSSFilter</title>
+  <description/>
+   <link>http://sputnik.freewisdom.org/lib/xssfilter/</link>
+     
+   <item>
+    <link>http://sputnik.freewisdom.org/files/xssfilter-$version.tar.gz</link>
+    <title>XSSFilter 8.04.20</title>
+    <guid isPermalink="true">http://sputnik.freewisdom.org/files/xssfilter-8.04.20.tar.gz</guid>
+    <description>first public version</description>
+   </item>
+ </channel>
+</rss>
