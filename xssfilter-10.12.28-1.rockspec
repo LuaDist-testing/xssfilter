@@ -1,8 +1,16 @@
-package = "XSSFilter"
-version = "8.04.20-0"
+-- This file was automatically generated for the LuaDist project.
+
+package = "xssfilter"
+version = "10.12.28-1"
+-- LuaDist source
 source = {
-   url = "http://sputnik.freewisdom.org/files/xssfilter-8.04.20.tar.gz",
+  tag = "10.12.28-1",
+  url = "git://github.com/LuaDist-testing/xssfilter.git"
 }
+-- Original source
+-- source = {
+--    url = "http://spu.tnik.org/files/xssfilter-10.12.28.tar.gz",
+-- }
 description = {
    summary    = "A filter to prevernt cross-site scripting (XSS) attacks",
    detailed   = [===[     XSSFilter is a module for filtering out unsafe tags from (X)HTML.
@@ -16,7 +24,7 @@ description = {
      supply their own or modify the default.
 ]===],
    license    =  "MIT/X11",
-   homepage   = "http://sputnik.freewisdom.org/lib/xssfilter/",
+   homepage   = "http://spu.tnik.org/lib/xssfilter/",
    maintainer = "Yuri Takhteyev (yuri@freewisdom.org)",
 }
 dependencies = {
@@ -25,9 +33,6 @@ build = {
   type = "none",
   install = {
      lua = {        ["xssfilter"] = "lua/xssfilter.lua",
-
-
      }
   }
 }
-

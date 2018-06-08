@@ -11,6 +11,8 @@
 
 module(..., package.seeall)
 
+local iconv_loaded, iconv = pcall(require, "iconv")
+
 -----------------------------------------------------------------------------
 -- Default configuration of which tags are allowed.  The client can override
 -- this by passing their own table.  The table allows two types of entries:
@@ -38,16 +40,19 @@ ALLOWED_TAGS = {
    "pre", "code",
    "acronym", "abbr", "cite", "dfn", "tt", "del", "ins", "kbd", "strike",
    "sub", "sup", "var",
-   "table", "tr", "th", "thead", "td", "caption", "tbody", "tfoot",
-
+   "table", "tr", "thead", "caption", "tbody", "tfoot",
+   "big", "center", "right", "left",
+   "hr",
+   "style",
+   "div",
    -- For "a" tag allow "name" and "href", and limit href to three protocols.
    a = {
       name = ".",
-      href= {"http://", "https://", "ftp://"},
+      href= {"^http://", "^https://", "^ftp://", "^mailto:", "^/", "#"},
    },
    -- For "img" tag allow only "src" and limit it to http.
    img = {
-      src = "http://",
+      src = {"^http://", "^/"},
    },
    -- Style is allowed on "span" as long as the string "url" does not occur
    -- in the value
@@ -60,6 +65,15 @@ ALLOWED_TAGS = {
             return nil, "'url' not allowed in the value of 'style'"
          end
       end
+   },
+   -- Enable the colspan/rowspan attributes for table elements
+   th = {
+	   colspan = ".",
+	   rowspan = ".",
+   },
+   td = {
+	   colspan = ".",
+	   rowspan = ".",
    }
 }
 
@@ -94,7 +108,6 @@ GENERIC_ATTRIBUTES = {
 -----------------------------------------------------------------------------
 -- The class table for the XSS Filter.
 -----------------------------------------------------------------------------
-XSSFilter = {}
 
 local XSSFilter = {}
 local XSSFilter_mt = {__metatable = {}, __index = XSSFilter}
@@ -111,6 +124,10 @@ local XSSFilter_mt = {__metatable = {}, __index = XSSFilter}
 function new(allowed_tags, generic_attrs)
    local obj = setmetatable({}, XSSFilter_mt)
    obj:init(allowed_tags)
+   if iconv_loaded then
+      obj.utf8_converter = iconv.new("UTF8", "UTF8")
+   end
+
    return obj
 end
 
@@ -215,9 +232,17 @@ end
 -- @return               A string with all but the allowed tags removed.
 -----------------------------------------------------------------------------
 function XSSFilter:filter(html)
+
+   if self.utf8_converter then
+       out, err = self.utf8_converter:iconv(html)
+       if err then
+          html = "[Invalid UTF8 - removed by XSSFilter]"
+       end
+   end
+
    local status, parsed = pcall(parse_xml, "<xml>"..html.."</xml>")
    if not status then
-      return nil, "XSSFilter could not parse (X)HTML"
+      return nil, "XSSFilter could not parse (X)HTML:\n"..html:gsub("<", "&lt;"):gsub(">", "&gt;")
    end
 
    local buffer = ""
